@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { createContext, useState } from "react";
+import Tabledetails from "./Tabledetails";
 
-
-
+export const TableContext = createContext(null);
+export const FormContext= createContext(null)
+export const IndexContext= createContext(null)
+export const UpdatedTableContext= createContext(null)
 export default function Details() {
   var id = 1;
+
   const [formData, setFormData] = useState({
    
     name: '',
@@ -16,21 +20,27 @@ export default function Details() {
   const[ tabledata, setTabledata]= useState([])
   const [editIndex, setEditIndex] = useState(null);
   
+  
+  
 
   function handleSubmit(e) {
     e.preventDefault()
 
-if(editIndex==null){
+if(editIndex==null ){
 
+  formData["id"]=tabledata.length+1
     setTabledata([...tabledata,formData])
-    console.log(tabledata)
+    console.log(formData)
+   
     
    }
    else{
-    const updateTableData=[...tabledata]
-    updateTableData[editIndex]={...formData}
-    setTabledata(updateTableData);
+    setTabledata(tabledata.map((data)=> {if(data.id==formData.id)
+       return formData 
+       else return data}));
     setEditIndex(null)
+    console.log(tabledata)
+
    }
 
 
@@ -74,20 +84,7 @@ function handleSort(e){
 
 }
 
-  function handleDelete(event) {
-    alert(event.target.name);
-    const filtereddata= tabledata.filter((d)=>d.name!==event.target.name)
-    console.log(filtereddata)
-    setTabledata(filtereddata)
-    
-  }
 
-  const handleEdit = (index) => {
-    // Set the form data with the selected row for editing
-    setFormData({ ...tabledata[index] });
-    setEditIndex(index);
-  };
-    
   
     
     
@@ -100,7 +97,7 @@ function handleSort(e){
       <div className="container-fluid">
         <div className="container mt-4">
           <div className="row">
-            <div className="col-lg-6 col-md-6 col-sm-12">
+            <div className="col-lg-4 col-md-4 col-sm-12">
               <div className="card">
                 <div className="card-body">
                   <h2>Form</h2>
@@ -177,7 +174,7 @@ function handleSort(e){
               </div>
             </div>
 
-            <div className="col-lg-6 ">
+            <div className="col-lg-8 col-md-8 col-sm-12 ">
              <div className="d-flex">
              <input
                         type="text"
@@ -204,51 +201,16 @@ function handleSort(e){
 
  
              </div>
+<TableContext.Provider value={tabledata}>
+  <FormContext.Provider value={setFormData}>
+    <IndexContext.Provider value={setEditIndex}>
+      <UpdatedTableContext.Provider value={setTabledata}>
+             <Tabledetails/>
+             </UpdatedTableContext.Provider>
+             </IndexContext.Provider>
+             </FormContext.Provider>
 
-              <table class="table">
-                <thead>
-                  <tr>
-                   
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Mobilenumber</th>
-                    <th scope="col">age</th>
-                    <th scope="col">Edit</th>
-                    <th scope="col">Delete</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {  tabledata.map((s, index) => {
-                    return (
-                      <tr key={index}>
-                        
-                        <td>{s.name}</td>
-                        <td>{s.email}</td>
-                        <td>{s.mobilenumber}</td>
-                        <td>{s.age}</td>
-                        <td>
-                          <button type="button"
-                           name={s.name}
-                          class="btn btn-success" onClick={()=>handleEdit(index)}>
-                            Edit
-                          </button>
-                        </td>
-                        <td>
-                          <button
-                            type="button"
-                            name={s.name}
-                            class="btn btn-danger"
-                            onClick={handleDelete}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+</TableContext.Provider>
             </div>
           </div>
         </div>
